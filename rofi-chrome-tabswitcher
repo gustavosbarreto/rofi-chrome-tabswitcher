@@ -1,0 +1,35 @@
+#!/bin/sh
+
+if [ -z "$ROFI_RETV" ]; then
+    rofi -show tab -modi "tab:$0"
+    exit 0
+fi
+
+# Chrome remote debugging port
+REMOTE_DEBUGGING_PORT=9222
+
+# Set prompt text
+echo -en "\0prompt\x1fTab\n"
+# Enable markup rows
+echo -en "\x00markup-rows\x1ftrue\n"
+
+# When a tab is selected from the menu, rofi calls this script with the text of that option as the first argument
+if [ -n "$1" ]; then
+    # Extract tab ID from argv[1] 
+    TAB=$(echo -n "$1" | gawk 'match($0, /<!--(.*)-->/, arr) { print arr[1] }')
+
+    # Activate the tab
+    curl http://localhost:$REMOTE_DEBUGGING_PORT/json/activate/$TAB > /dev/null
+    
+    exit 0
+fi
+
+# Get tabs from remote debugging interface
+IFS="
+"
+for LINE in $(curl http://localhost:$REMOTE_DEBUGGING_PORT/json | jq -r '.[] | select(.type=="page") | .title + "<!--" + .id + "-->"'); do
+    # HACK: unfortunately, rofi does not provide a way to assign a data to a row, just the row text.
+    # So, we need to hide the ID inside a comment in the row as shown bellow:
+    # tab title<!--id-->
+    echo $LINE
+done
