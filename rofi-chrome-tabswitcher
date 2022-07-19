@@ -40,5 +40,5 @@ for LINE in $(curl http://localhost:$REMOTE_DEBUGGING_PORT/json | jq -r '.[] | s
     # HACK: unfortunately, rofi does not provide a way to assign a data to a row, just the row text.
     # So, we need to hide the ID inside a comment in the row as shown bellow:
     # tab title<!--id-->
-    echo -e "$TITLE <!-- $ID -->\x00icon\x1f$ICON"
+    echo -e "$TITLE<!--$ID-->\x00icon\x1f$ICON"
 done
