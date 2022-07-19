@@ -9,4 +9,5 @@ To use this script you need to enable chrome remote debugging by starting it wit
 
 * cURL
 * jq
-
+* sqlite3
+* xxd
