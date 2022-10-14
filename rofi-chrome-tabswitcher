@@ -24,6 +24,8 @@ if [ -n "$1" ]; then
     exit 0
 fi
 
+ICONS_DIR=$(mktemp -d -t rofi-chrome-tabswitcher-XXXX)
+
 # Get tabs from remote debugging interface
 IFS="
 "
@@ -31,7 +33,7 @@ for LINE in $(curl http://localhost:$REMOTE_DEBUGGING_PORT/json | jq -r '.[] | s
     ID=$(echo $LINE | awk -F'\t' '{print $1}')
     URL=$(echo $LINE | awk -F'\t' '{print $2}')
     TITLE=$(echo $LINE | awk -F'\t' '{print $3}')
-    ICON=$(echo /tmp/icons/$(echo -n $ID | base64).png)
+    ICON="$ICONS_DIR/$(echo -n $ID | base64).png"
 
     echo "select quote(favicon_bitmaps.image_data) from favicon_bitmaps,icon_mapping
     	 	 where icon_mapping.page_url='$URL' and icon_mapping.icon_id=favicon_bitmaps.icon_id" | \
